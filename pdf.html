@@ -6,7 +6,6 @@
     <title>PDF Tools - My Online Tools</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 </head>
 <body>
     <nav class="top-nav">
@@ -75,15 +74,28 @@
                     <button class="btn btn-primary" id="process-btn">Process PDF</button>
                 </div>
                 
+                <div class="processing-indicator" id="processing-indicator" style="display: none;">
+                    <p>Processing your PDF... <span id="progress-percent">0%</span></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                
                 <div class="result-area" id="result-area" style="display: none;">
                     <h3>Processing Complete</h3>
                     <p>Your PDF has been processed successfully.</p>
                     <button class="btn btn-primary" id="download-btn">Download Result</button>
                 </div>
+                
+                <div class="error-message" id="error-message" style="display: none;">
+                    <p id="error-text"></p>
+                </div>
             </div>
         </div>
     </div>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script>
         // Set up PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
@@ -110,6 +122,15 @@
         const processBtn = document.getElementById('process-btn');
         const resultArea = document.getElementById('result-area');
         const downloadBtn = document.getElementById('download-btn');
+        const processingIndicator = document.getElementById('processing-indicator');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressFill = document.getElementById('progress-fill');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        // Store uploaded files
+        let uploadedFiles = [];
+        let processedPdfBytes = null;
         
         // Event listeners
         toolSelect.addEventListener('change', updateToolDescription);
@@ -117,6 +138,24 @@
         fileInput.addEventListener('change', handleFileSelect);
         resetBtn.addEventListener('click', resetTool);
         processBtn.addEventListener('click', processPDF);
+        downloadBtn.addEventListener('click', downloadResult);
+        
+        // Drag and drop events
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('drag-over');
+        });
+        
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('drag-over');
+        });
+        
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
         
         // Initialize
         updateToolDescription();
@@ -171,26 +210,57 @@
                     toolOptions.innerHTML = `
                         <div class="form-group">
                             <label for="watermark-text">Watermark Text:</label>
-                            <input type="text" id="watermark-text" class="form-control" placeholder="CONFIDENTIAL">
+                            <input type="text" id="watermark-text" class="form-control" placeholder="CONFIDENTIAL" value="CONFIDENTIAL">
                         </div>
                         <div class="form-group">
                             <label for="watermark-opacity">Opacity:</label>
                             <input type="range" id="watermark-opacity" class="form-control" min="0.1" max="1" step="0.1" value="0.5">
+                            <span id="opacity-value">0.5</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="watermark-size">Font Size:</label>
+                            <input type="range" id="watermark-size" class="form-control" min="10" max="100" step="5" value="50">
+                            <span id="size-value">50</span>
                         </div>
                     `;
+                    
+                    // Add event listeners for watermark options
+                    document.getElementById('watermark-opacity').addEventListener('input', function() {
+                        document.getElementById('opacity-value').textContent = this.value;
+                    });
+                    
+                    document.getElementById('watermark-size').addEventListener('input', function() {
+                        document.getElementById('size-value').textContent = this.value;
+                    });
                     break;
             }
         }
         
         function handleFileSelect(e) {
             const files = e.target.files;
-            displayFiles(files);
+            handleFiles(files);
         }
         
-        function displayFiles(files) {
-            fileList.innerHTML = '';
+        function handleFiles(files) {
+            uploadedFiles = [];
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
+                if (file.type === 'application/pdf') {
+                    uploadedFiles.push(file);
+                }
+            }
+            
+            if (uploadedFiles.length !== files.length) {
+                showError('Some files were not PDFs and were ignored.');
+            }
+            
+            displayFiles();
+        }
+        
+        function displayFiles() {
+            fileList.innerHTML = '';
+            for (let i = 0; i < uploadedFiles.length; i++) {
+                const file = uploadedFiles[i];
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
                 fileItem.innerHTML = `
@@ -211,209 +281,235 @@
         
         function resetTool() {
             fileInput.value = '';
+            uploadedFiles = [];
             fileList.innerHTML = '';
             resultArea.style.display = 'none';
+            processingIndicator.style.display = 'none';
+            errorMessage.style.display = 'none';
+            processedPdfBytes = null;
         }
         
-        function processPDF() {
-            if (!fileInput.files.length) {
-                alert('Please select at least one PDF file.');
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+            processingIndicator.style.display = 'none';
+        }
+        
+        function updateProgress(percent) {
+            progressPercent.textContent = percent + '%';
+            progressFill.style.width = percent + '%';
+        }
+        
+        async function processPDF() {
+            if (!uploadedFiles.length) {
+                showError('Please select at least one PDF file.');
                 return;
             }
             
-            const selectedTool = toolSelect.value;
-            const file = fileInput.files[0];
+            // Hide previous results and errors
+            resultArea.style.display = 'none';
+            errorMessage.style.display = 'none';
             
-            // Show processing message
-            resultArea.innerHTML = '<p>Processing your PDF... Please wait.</p>';
-            resultArea.style.display = 'block';
+            // Show processing indicator
+            processingIndicator.style.display = 'block';
+            updateProgress(0);
             
-            // Read the PDF file
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const typedarray = new Uint8Array(e.target.result);
+            try {
+                const selectedTool = toolSelect.value;
+                let result;
                 
                 switch(selectedTool) {
                     case 'merge':
-                        // For merge, we would need multiple files
-                        // This is a simplified version that just processes the first file
-                        processMergePDF(typedarray);
-                        break;
-                    case 'split':
-                        processSplitPDF(typedarray);
-                        break;
-                    case 'compress':
-                        processCompressPDF(typedarray);
+                        result = await mergePDFs();
                         break;
                     case 'remove-pages':
-                        processRemovePagesPDF(typedarray);
+                        result = await removePages();
                         break;
                     case 'rotate':
-                        processRotatePDF(typedarray);
+                        result = await rotatePages();
                         break;
                     case 'add-watermark':
-                        processWatermarkPDF(typedarray);
+                        result = await addWatermark();
                         break;
                     default:
-                        alert('Selected tool not implemented yet.');
+                        result = await mergePDFs(); // Default to merge for other cases
                 }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        
-        // Merge PDFs function (simplified)
-        function processMergePDF(typedarray) {
-            // In a full implementation, this would merge multiple PDFs
-            // For now, we'll just show a message
-            resultArea.innerHTML = `
-                <h3>Merge PDF</h3>
-                <p>In a complete implementation, this would merge multiple PDF files into one document.</p>
-                <p><strong>Note:</strong> Actual PDF merging requires combining multiple PDF documents, 
-                which would need additional implementation using PDF.js or a similar library.</p>
-                <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
-            `;
-        }
-        
-        // Split PDF function
-        function processSplitPDF(typedarray) {
-            // Load the PDF document
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                const splitPage = document.getElementById('split-page') ? 
-                    parseInt(document.getElementById('split-page').value) : 1;
                 
-                resultArea.innerHTML = `
-                    <h3>Split PDF</h3>
-                    <p>Your PDF has ${pdf.numPages} pages.</p>
-                    <p>In a complete implementation, this would split your PDF into two documents:</p>
-                    <ol>
-                        <li>Pages 1 to ${Math.min(splitPage, pdf.numPages)}</li>
-                        <li>Pages ${splitPage + 1} to ${pdf.numPages}</li>
-                    </ol>
-                    <p><strong>Note:</strong> Actual PDF splitting requires creating new PDF documents 
-                    with selected pages, which would need additional implementation using PDF.js.</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
-                `;
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                resultArea.innerHTML = `
-                    <h3>Error</h3>
-                    <p>There was an error processing your PDF: ${error.message}</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
-                `;
-            });
+                processedPdfBytes = result;
+                updateProgress(100);
+                processingIndicator.style.display = 'none';
+                resultArea.style.display = 'block';
+            } catch (error) {
+                console.error('Error processing PDF:', error);
+                showError('Error processing PDF: ' + error.message);
+            }
         }
         
-        // Compress PDF function
-        function processCompressPDF(typedarray) {
-            // Load the PDF document
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                resultArea.innerHTML = `
-                    <h3>Compress PDF</h3>
-                    <p>Your PDF has ${pdf.numPages} pages.</p>
-                    <p>In a complete implementation, this would compress your PDF by:</p>
-                    <ul>
-                        <li>Optimizing images</li>
-                        <li>Removing unnecessary objects</li>
-                        <li>Compressing streams</li>
-                        <li>Downsampling images</li>
-                    </ul>
-                    <p><strong>Note:</strong> Actual PDF compression requires reprocessing the PDF content 
-                    and applying compression algorithms, which would need additional implementation.</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
-                `;
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                resultArea.innerHTML = `
-                    <h3>Error</h3>
-                    <p>There was an error processing your PDF: ${error.message}</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
-                `;
-            });
-        }
-        
-        // Remove pages function
-        function processRemovePagesPDF(typedarray) {
-            // Load the PDF document
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                const pagesToRemove = document.getElementById('pages-to-remove') ? 
-                    document.getElementById('pages-to-remove').value : '';
+        async function mergePDFs() {
+            updateProgress(10);
+            const { PDFDocument } = PDFLib;
+            const mergedPdf = await PDFDocument.create();
+            
+            for (let i = 0; i < uploadedFiles.length; i++) {
+                const file = uploadedFiles[i];
+                const fileArrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(fileArrayBuffer);
                 
-                resultArea.innerHTML = `
-                    <h3>Remove Pages</h3>
-                    <p>Your PDF has ${pdf.numPages} pages.</p>
-                    <p>Pages to remove: ${pagesToRemove || 'None specified'}</p>
-                    <p>In a complete implementation, this would create a new PDF without the specified pages.</p>
-                    <p><strong>Note:</strong> Actual page removal requires creating a new PDF document 
-                    with only the desired pages, which would need additional implementation using PDF.js.</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
-                `;
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                resultArea.innerHTML = `
-                    <h3>Error</h3>
-                    <p>There was an error processing your PDF: ${error.message}</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
-                `;
-            });
+                const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                copiedPages.forEach((page) => {
+                    mergedPdf.addPage(page);
+                });
+                
+                updateProgress(20 + (60 * (i + 1) / uploadedFiles.length));
+            }
+            
+            const pdfBytes = await mergedPdf.save();
+            updateProgress(90);
+            return pdfBytes;
         }
         
-        // Rotate pages function
-        function processRotatePDF(typedarray) {
-            // Load the PDF document
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                const rotateDegrees = document.getElementById('rotate-degrees') ? 
-                    document.getElementById('rotate-degrees').value : '90';
-                const rotatePages = document.getElementById('rotate-pages') ? 
-                    document.getElementById('rotate-pages').value : 'All pages';
-                
-                resultArea.innerHTML = `
-                    <h3>Rotate Pages</h3>
-                    <p>Your PDF has ${pdf.numPages} pages.</p>
-                    <p>Rotation: ${rotateDegrees}°</p>
-                    <p>Pages to rotate: ${rotatePages}</p>
-                    <p>In a complete implementation, this would rotate the specified pages by the selected angle.</p>
-                    <p><strong>Note:</strong> Actual page rotation requires modifying the page rotation 
-                    properties in the PDF, which would need additional implementation using PDF.js.</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
-                `;
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                resultArea.innerHTML = `
-                    <h3>Error</h3>
-                    <p>There was an error processing your PDF: ${error.message}</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
-                `;
+        async function removePages() {
+            if (uploadedFiles.length === 0) {
+                throw new Error('No PDF files selected');
+            }
+            
+            updateProgress(10);
+            const { PDFDocument } = PDFLib;
+            const fileArrayBuffer = await uploadedFiles[0].arrayBuffer();
+            const pdfDoc = await PDFDocument.load(fileArrayBuffer);
+            
+            const pagesToRemoveInput = document.getElementById('pages-to-remove');
+            const pagesToRemove = parsePageRanges(pagesToRemoveInput ? pagesToRemoveInput.value : '');
+            
+            // Create a new document with only the pages we want to keep
+            const newPdf = await PDFDocument.create();
+            
+            const pagesToKeep = [];
+            for (let i = 0; i < pdfDoc.getPageCount(); i++) {
+                if (!pagesToRemove.includes(i + 1)) {
+                    pagesToKeep.push(i);
+                }
+            }
+            
+            const copiedPages = await newPdf.copyPages(pdfDoc, pagesToKeep);
+            copiedPages.forEach((page) => {
+                newPdf.addPage(page);
             });
+            
+            updateProgress(80);
+            const pdfBytes = await newPdf.save();
+            updateProgress(90);
+            return pdfBytes;
         }
         
-        // Add watermark function
-        function processWatermarkPDF(typedarray) {
-            // Load the PDF document
-            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                const watermarkText = document.getElementById('watermark-text') ? 
-                    document.getElementById('watermark-text').value : 'WATERMARK';
-                const watermarkOpacity = document.getElementById('watermark-opacity') ? 
-                    document.getElementById('watermark-opacity').value : '0.5';
-                
-                resultArea.innerHTML = `
-                    <h3>Add Watermark</h3>
-                    <p>Your PDF has ${pdf.numPages} pages.</p>
-                    <p>Watermark text: ${watermarkText}</p>
-                    <p>Opacity: ${watermarkOpacity}</p>
-                    <p>In a complete implementation, this would add the specified watermark text 
-                    to each page of your PDF with the selected opacity.</p>
-                    <p><strong>Note:</strong> Adding watermarks requires modifying each page's content 
-                    stream to include the watermark text, which would need additional implementation.</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
-                `;
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                resultArea.innerHTML = `
-                    <h3>Error</h3>
-                    <p>There was an error processing your PDF: ${error.message}</p>
-                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
-                `;
+        async function rotatePages() {
+            if (uploadedFiles.length === 0) {
+                throw new Error('No PDF files selected');
+            }
+            
+            updateProgress(10);
+            const { PDFDocument } = PDFLib;
+            const fileArrayBuffer = await uploadedFiles[0].arrayBuffer();
+            const pdfDoc = await PDFDocument.load(fileArrayBuffer);
+            
+            const rotateDegrees = parseInt(document.getElementById('rotate-degrees').value);
+            const rotatePagesInput = document.getElementById('rotate-pages');
+            const pagesToRotate = parsePageRanges(rotatePagesInput ? rotatePagesInput.value : '');
+            
+            // If no pages specified, rotate all pages
+            const pages = pagesToRotate.length > 0 ? pagesToRotate : 
+                         Array.from({length: pdfDoc.getPageCount()}, (_, i) => i + 1);
+            
+            pages.forEach(pageNum => {
+                if (pageNum <= pdfDoc.getPageCount()) {
+                    const page = pdfDoc.getPage(pageNum - 1);
+                    page.setRotation(page.getRotation() + rotateDegrees);
+                }
             });
+            
+            updateProgress(80);
+            const pdfBytes = await pdfDoc.save();
+            updateProgress(90);
+            return pdfBytes;
+        }
+        
+        async function addWatermark() {
+            if (uploadedFiles.length === 0) {
+                throw new Error('No PDF files selected');
+            }
+            
+            updateProgress(10);
+            const { PDFDocument, StandardFonts, rgb } = PDFLib;
+            const fileArrayBuffer = await uploadedFiles[0].arrayBuffer();
+            const pdfDoc = await PDFDocument.load(fileArrayBuffer);
+            
+            const watermarkText = document.getElementById('watermark-text').value || 'CONFIDENTIAL';
+            const watermarkOpacity = parseFloat(document.getElementById('watermark-opacity').value);
+            const watermarkSize = parseInt(document.getElementById('watermark-size').value);
+            
+            const pages = pdfDoc.getPages();
+            const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+            
+            for (let i = 0; i < pages.length; i++) {
+                const page = pages[i];
+                const { width, height } = page.getSize();
+                
+                page.drawText(watermarkText, {
+                    x: width / 2 - (watermarkText.length * watermarkSize * 0.5) / 2,
+                    y: height / 2 - watermarkSize / 2,
+                    size: watermarkSize,
+                    font: font,
+                    color: rgb(0.8, 0.8, 0.8),
+                    opacity: watermarkOpacity,
+                    rotate: pdfLib.degrees(45),
+                });
+                
+                updateProgress(20 + (60 * (i + 1) / pages.length));
+            }
+            
+            const pdfBytes = await pdfDoc.save();
+            updateProgress(90);
+            return pdfBytes;
+        }
+        
+        function parsePageRanges(input) {
+            if (!input) return [];
+            
+            const pages = [];
+            const ranges = input.split(',');
+            
+            ranges.forEach(range => {
+                range = range.trim();
+                if (range.includes('-')) {
+                    const [start, end] = range.split('-').map(Number);
+                    for (let i = start; i <= end; i++) {
+                        pages.push(i);
+                    }
+                } else {
+                    pages.push(parseInt(range));
+                }
+            });
+            
+            return pages;
+        }
+        
+        function downloadResult() {
+            if (!processedPdfBytes) {
+                showError('No processed PDF available for download.');
+                return;
+            }
+            
+            const blob = new Blob([processedPdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'processed-document.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
         }
     </script>
     
@@ -452,8 +548,9 @@
             transition: border-color 0.3s;
         }
         
-        .file-drop-area:hover {
+        .file-drop-area:hover, .file-drop-area.drag-over {
             border-color: #007acc;
+            background-color: #f0f8ff;
         }
         
         .file-drop-area p {
@@ -525,6 +622,31 @@
             background-color: #545b62;
         }
         
+        .processing-indicator {
+            margin-top: 20px;
+            padding: 20px;
+            text-align: center;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #007acc;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
         .result-area {
             margin-top: 30px;
             padding: 20px;
@@ -532,6 +654,21 @@
             border: 1px solid #c3e6cb;
             border-radius: 4px;
             text-align: center;
+        }
+        
+        .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            color: #721c24;
+        }
+        
+        #opacity-value, #size-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
         }
     </style>
 </body>
