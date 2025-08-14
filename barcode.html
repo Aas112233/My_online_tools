@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode & QR Code Generator - My Online Tools</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <a href="index.html">My Online Tools</a>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="calculator.html" class="nav-link" id="calculator-link">Scientific Calculator</a>
+            </li>
+            <li class="nav-item">
+                <a href="index.html" class="nav-link active" id="barcode-link">Barcode & QR Code</a>
+            </li>
+            <li class="nav-item">
+                <a href="pdf.html" class="nav-link" id="pdf-link">PDF Tools</a>
+            </li>
+            <li class="nav-item">
+                <a href="design-qr.html" class="nav-link" id="design-qr-link">Design QR Code</a>
+            </li>
+            <li class="nav-item">
+                <a href="extra.html" class="nav-link" id="extra-link">Extra Tools</a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="content-container">
+        <div class="tool-section">
+            <h2>Barcode & QR Code Generator</h2>
+            
+            <!-- Barcode Preview Window -->
+            <div class="barcode-preview">
+                <svg id="barcode"></svg>
+                <div id="qrcode" style="display: none;"></div>
+                <span id="invalid" style="display: none;">Not valid data for this barcode type!</span>
+            </div>
+            
+            <!-- Input and Main Controls -->
+            <div class="barcode-input-container">
+                <input type="text" id="userInput" class="barcode-text-input" value="Example 1234" placeholder="Enter text to encode">
+                <button id="generate-button" class="generate-btn">Generate</button>
+                <select id="barcodeType" class="barcode-type-select">
+                    <option value="CODE128">CODE128</option>
+                    <option value="CODE128A">CODE128A</option>
+                    <option value="CODE128B">CODE128B</option>
+                    <option value="CODE128C">CODE128C</option>
+                    <option value="EAN13">EAN13</option>
+                    <option value="EAN8">EAN8</option>
+                    <option value="EAN5">EAN5</option>
+                    <option value="EAN2">EAN2</option>
+                    <option value="UPC">UPC</option>
+                    <option value="UPCE">UPCE</option>
+                    <option value="CODE39">CODE39</option>
+                    <option value="ITF14">ITF14</option>
+                    <option value="ITF">ITF</option>
+                    <option value="MSI">MSI</option>
+                    <option value="MSI10">MSI10</option>
+                    <option value="MSI11">MSI11</option>
+                    <option value="MSI1010">MSI1010</option>
+                    <option value="MSI1110">MSI1110</option>
+                    <option value="pharmacode">Pharmacode</option>
+                    <option value="codabar">Codabar</option>
+                    <option value="code93">CODE93</option>
+                    <option value="QR">QR Code</option>
+                </select>
+            </div>
+            
+            <!-- Advanced Options Toggle -->
+            <div class="advanced-options-toggle">
+                <button id="toggle-advanced" class="toggle-btn">
+                    <span>Advanced Options</span>
+                    <span class="arrow">▼</span>
+                </button>
+            </div>
+            
+            <!-- Advanced Options Container -->
+            <div id="advanced-options" class="advanced-options-container">
+                <div class="options-columns">
+                    <!-- Left Column -->
+                    <div class="options-column">
+                        <!-- Bar Width -->
+                        <div class="option-row">
+                            <label for="bar-width">Bar Width</label>
+                            <div class="option-controls">
+                                <input id="bar-width" type="range" min="1" max="4" step="1" value="2">
+                                <span id="bar-width-display">2</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Height -->
+                        <div class="option-row">
+                            <label for="bar-height">Height</label>
+                            <div class="option-controls">
+                                <input id="bar-height" type="range" min="10" max="150" step="5" value="100">
+                                <span id="bar-height-display">100</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Margin -->
+                        <div class="option-row">
+                            <label for="bar-margin">Margin</label>
+                            <div class="option-controls">
+                                <input id="bar-margin" type="range" min="0" max="25" step="1" value="10">
+                                <span id="bar-margin-display">10</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Background Color -->
+                        <div class="option-row">
+                            <label for="background-color">Background</label>
+                            <div class="option-controls">
+                                <input id="background-color" class="color-picker" value="#FFFFFF" type="color">
+                            </div>
+                        </div>
+                        
+                        <!-- Line Color -->
+                        <div class="option-row">
+                            <label for="line-color">Line Color</label>
+                            <div class="option-controls">
+                                <input id="line-color" class="color-picker" value="#000000" type="color">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="options-column">
+                        <!-- Show Text -->
+                        <div class="option-row">
+                            <label>Show Text</label>
+                            <div class="option-controls">
+                                <button class="btn btn-primary display-text" value="true">Show</button>
+                                <button class="btn display-text" value="false">Hide</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Text Align -->
+                        <div class="option-row">
+                            <label>Text Align</label>
+                            <div class="option-controls">
+                                <button class="btn text-align" value="left">Left</button>
+                                <button class="btn btn-primary text-align" value="center">Center</button>
+                                <button class="btn text-align" value="right">Right</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Font -->
+                        <div class="option-row">
+                            <label for="font">Font</label>
+                            <div class="option-controls">
+                                <select class="form-control" id="font">
+                                    <option value="monospace" selected>Monospace</option>
+                                    <option value="sans-serif">Sans-serif</option>
+                                    <option value="serif">Serif</option>
+                                    <option value="fantasy">Fantasy</option>
+                                    <option value="cursive">Cursive</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Font Options -->
+                        <div class="option-row">
+                            <label>Font Options</label>
+                            <div class="option-controls">
+                                <button class="btn font-option" value="bold">Bold</button>
+                                <button class="btn font-option" value="italic">Italic</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Font Size -->
+                        <div class="option-row">
+                            <label for="bar-fontSize">Font Size</label>
+                            <div class="option-controls">
+                                <input id="bar-fontSize" type="range" min="8" max="36" step="1" value="20">
+                                <span id="bar-fontSize-display">20</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Text Margin -->
+                        <div class="option-row">
+                            <label for="bar-text-margin">Text Margin</label>
+                            <div class="option-controls">
+                                <input id="bar-text-margin" type="range" min="-15" max="40" step="1" value="0">
+                                <span id="bar-text-margin-display">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.12.1/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        // Barcode generation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const barcodeElement = document.getElementById('barcode');
+            const qrcodeElement = document.getElementById('qrcode');
+            const userInput = document.getElementById('userInput');
+            const barcodeType = document.getElementById('barcodeType');
+            const invalidMessage = document.getElementById('invalid');
+            const generateButton = document.getElementById('generate-button');
+            const toggleAdvanced = document.getElementById('toggle-advanced');
+            const advancedOptions = document.getElementById('advanced-options');
+            
+            // Control elements
+            const barWidth = document.getElementById('bar-width');
+            const barHeight = document.getElementById('bar-height');
+            const barMargin = document.getElementById('bar-margin');
+            const backgroundColor = document.getElementById('background-color');
+            const lineColor = document.getElementById('line-color');
+            const displayTextButtons = document.querySelectorAll('.display-text');
+            const textAlignButtons = document.querySelectorAll('.text-align');
+            const fontSelect = document.getElementById('font');
+            const fontOptionButtons = document.querySelectorAll('.font-option');
+            const barFontSize = document.getElementById('bar-fontSize');
+            const barTextMargin = document.getElementById('bar-text-margin');
+            
+            // Display value elements
+            const barWidthDisplay = document.getElementById('bar-width-display');
+            const barHeightDisplay = document.getElementById('bar-height-display');
+            const barMarginDisplay = document.getElementById('bar-margin-display');
+            const barFontSizeDisplay = document.getElementById('bar-fontSize-display');
+            const barTextMarginDisplay = document.getElementById('bar-text-margin-display');
+            
+            // QR Code instance
+            let qrCodeInstance = null;
+            
+            // Toggle advanced options
+            toggleAdvanced.addEventListener('click', function() {
+                const isExpanded = advancedOptions.style.display === 'block';
+                advancedOptions.style.display = isExpanded ? 'none' : 'block';
+                const arrow = this.querySelector('.arrow');
+                arrow.textContent = isExpanded ? '▼' : '▲';
+            });
+            
+            // Generate barcode function
+            function generateBarcode() {
+                const text = userInput.value || 'Example 1234';
+                const type = barcodeType.value;
+                
+                // Clear previous barcode/QR code
+                barcodeElement.innerHTML = '';
+                qrcodeElement.innerHTML = '';
+                invalidMessage.style.display = 'none';
+                
+                // Handle QR code separately
+                if (type === 'QR') {
+                    try {
+                        // Hide barcode element and show QR code element
+                        barcodeElement.style.display = 'none';
+                        qrcodeElement.style.display = 'block';
+                        
+                        // Clear previous QR code if exists
+                        if (qrCodeInstance) {
+                            qrCodeInstance.clear();
+                        }
+                        
+                        // Create new QR code
+                        qrCodeInstance = new QRCode(qrcodeElement, {
+                            text: text,
+                            width: 200,
+                            height: 200,
+                            colorDark: lineColor.value,
+                            colorLight: backgroundColor.value,
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                        
+                        console.log('QR code generated successfully');
+                    } catch (e) {
+                        console.error('QR Code generation error:', e);
+                        invalidMessage.style.display = 'block';
+                        qrcodeElement.style.display = 'none';
+                    }
+                    return;
+                }
+                
+                // Handle regular barcodes
+                // Hide QR code element and show barcode element
+                qrcodeElement.style.display = 'none';
+                barcodeElement.style.display = 'block';
+                
+                const settings = {
+                    format: type,
+                    width: parseInt(barWidth.value),
+                    height: parseInt(barHeight.value),
+                    margin: parseInt(barMargin.value),
+                    background: backgroundColor.value,
+                    lineColor: lineColor.value,
+                    displayValue: document.querySelector('.display-text.btn-primary').value === 'true',
+                    textAlign: document.querySelector('.text-align.btn-primary').value,
+                    font: fontSelect.value,
+                    fontSize: parseInt(barFontSize.value),
+                    textMargin: parseInt(barTextMargin.value)
+                };
+                
+                // Handle font options
+                const fontOptions = [];
+                fontOptionButtons.forEach(button => {
+                    if (button.classList.contains('btn-primary')) {
+                        fontOptions.push(button.value);
+                    }
+                });
+                
+                if (fontOptions.includes('bold')) settings.fontOptions = settings.fontOptions ? settings.fontOptions + ' bold' : 'bold';
+                if (fontOptions.includes('italic')) settings.fontOptions = settings.fontOptions ? settings.fontOptions + ' italic' : 'italic';
+                
+                try {
+                    console.log('Generating barcode with settings:', settings);
+                    JsBarcode(barcodeElement, text, settings);
+                    invalidMessage.style.display = 'none';
+                    barcodeElement.style.display = 'block';
+                    console.log('Barcode generated successfully');
+                } catch (e) {
+                    console.error('Barcode generation error:', e);
+                    invalidMessage.style.display = 'block';
+                    barcodeElement.style.display = 'none';
+                }
+            }
+            
+            // Initialize display values
+            barWidthDisplay.textContent = barWidth.value;
+            barHeightDisplay.textContent = barHeight.value;
+            barMarginDisplay.textContent = barMargin.value;
+            barFontSizeDisplay.textContent = barFontSize.value;
+            barTextMarginDisplay.textContent = barTextMargin.value;
+            
+            // Initialize with a default barcode
+            generateBarcode();
+            
+            // Generate barcode on button click
+            if (generateButton) {
+                generateButton.addEventListener('click', generateBarcode);
+            }
+            
+            // Also generate on input change and type change for better UX
+            if (userInput) {
+                userInput.addEventListener('input', generateBarcode);
+            }
+            
+            if (barcodeType) {
+                barcodeType.addEventListener('change', generateBarcode);
+            }
+            
+            // Add event listeners for all controls
+            if (barWidth) {
+                barWidth.addEventListener('input', function() {
+                    barWidthDisplay.textContent = this.value;
+                    generateBarcode();
+                });
+            }
+            
+            if (barHeight) {
+                barHeight.addEventListener('input', function() {
+                    barHeightDisplay.textContent = this.value;
+                    generateBarcode();
+                });
+            }
+            
+            if (barMargin) {
+                barMargin.addEventListener('input', function() {
+                    barMarginDisplay.textContent = this.value;
+                    generateBarcode();
+                });
+            }
+            
+            if (backgroundColor) {
+                backgroundColor.addEventListener('input', generateBarcode);
+            }
+            
+            if (lineColor) {
+                lineColor.addEventListener('input', generateBarcode);
+            }
+            
+            // Display text buttons
+            if (displayTextButtons) {
+                // Initialize the first button as active by default
+                if (displayTextButtons.length > 0) {
+                    displayTextButtons[0].classList.add('btn-primary');
+                }
+                
+                displayTextButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        displayTextButtons.forEach(btn => btn.classList.remove('btn-primary'));
+                        this.classList.add('btn-primary');
+                        generateBarcode();
+                    });
+                });
+            }
+            
+            // Text align buttons
+            if (textAlignButtons) {
+                textAlignButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        textAlignButtons.forEach(btn => btn.classList.remove('btn-primary'));
+                        this.classList.add('btn-primary');
+                        generateBarcode();
+                    });
+                });
+            }
+            
+            // Font options buttons
+            if (fontOptionButtons) {
+                fontOptionButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        this.classList.toggle('btn-primary');
+                        generateBarcode();
+                    });
+                });
+            }
+            
+            if (fontSelect) {
+                fontSelect.addEventListener('change', generateBarcode);
+            }
+            
+            if (barFontSize) {
+                barFontSize.addEventListener('input', function() {
+                    barFontSizeDisplay.textContent = this.value;
+                    generateBarcode();
+                });
+            }
+            
+            if (barTextMargin) {
+                barTextMargin.addEventListener('input', function() {
+                    barTextMarginDisplay.textContent = this.value;
+                    generateBarcode();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

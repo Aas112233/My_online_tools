@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design QR Code - My Online Tools</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="top-nav">
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="calculator.html" class="nav-link" id="calculator-link">Scientific Calculator</a>
+            </li>
+            <li class="nav-item">
+                <a href="index.html" class="nav-link" id="barcode-link">Barcode & QR Code</a>
+            </li>
+            <li class="nav-item">
+                <a href="pdf.html" class="nav-link" id="pdf-link">PDF Tools</a>
+            </li>
+            <li class="nav-item">
+                <a href="design-qr.html" class="nav-link active" id="design-qr-link">Design QR Code</a>
+            </li>
+            <li class="nav-item">
+                <a href="extra.html" class="nav-link" id="extra-link">Extra Tools</a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="content-container">
+        <div class="tool-section">
+            <h2>Design QR Code</h2>
+            
+            <!-- QR Code Preview Window -->
+            <div class="qr-preview-container">
+                <div id="qr-code-preview"></div>
+            </div>
+            
+            <!-- Template Gallery -->
+            <div class="template-gallery">
+                <h3>Quick Templates</h3>
+                <div class="template-grid">
+                    <div class="template-item" data-template="">
+                        <div class="template-preview">None</div>
+                        <div class="template-name">None</div>
+                    </div>
+                    <div class="template-item" data-template="default">
+                        <div class="template-preview template-default"></div>
+                        <div class="template-name">Default</div>
+                    </div>
+                    <div class="template-item" data-template="ocean">
+                        <div class="template-preview template-ocean"></div>
+                        <div class="template-name">Ocean</div>
+                    </div>
+                    <div class="template-item" data-template="sunflower">
+                        <div class="template-preview template-sunflower"></div>
+                        <div class="template-name">Sunflower</div>
+                    </div>
+                    <div class="template-item" data-template="luxury">
+                        <div class="template-preview template-luxury"></div>
+                        <div class="template-name">Luxury</div>
+                    </div>
+                    <div class="template-item" data-template="bitcoin">
+                        <div class="template-preview template-bitcoin"></div>
+                        <div class="template-name">Bitcoin</div>
+                    </div>
+                    <div class="template-item" data-template="starbucks">
+                        <div class="template-preview template-starbucks"></div>
+                        <div class="template-name">Starbucks</div>
+                    </div>
+                    <div class="template-item" data-template="angular">
+                        <div class="template-preview template-angular"></div>
+                        <div class="template-name">Angular</div>
+                    </div>
+                    <div class="template-item" data-template="facebook">
+                        <div class="template-preview template-facebook"></div>
+                        <div class="template-name">Facebook</div>
+                    </div>
+                    <div class="template-item" data-template="beans">
+                        <div class="template-preview template-beans"></div>
+                        <div class="template-name">Beans</div>
+                    </div>
+                    <div class="template-item" data-template="green">
+                        <div class="template-preview template-green"></div>
+                        <div class="template-name">Green</div>
+                    </div>
+                    <div class="template-item" data-template="sky">
+                        <div class="template-preview template-sky"></div>
+                        <div class="template-name">Sky</div>
+                    </div>
+                    <div class="template-item" data-template="mosaic">
+                        <div class="template-preview template-mosaic"></div>
+                        <div class="template-name">Mosaic</div>
+                    </div>
+                    <div class="template-item" data-template="coffee">
+                        <div class="template-preview template-coffee"></div>
+                        <div class="template-name">Coffee</div>
+                    </div>
+                    <div class="template-item" data-template="vintage">
+                        <div class="template-preview template-vintage"></div>
+                        <div class="template-name">Vintage</div>
+                    </div>
+                    <div class="template-item" data-template="stamp">
+                        <div class="template-preview template-stamp"></div>
+                        <div class="template-name">Stamp</div>
+                    </div>
+                    <div class="template-item" data-template="chess">
+                        <div class="template-preview template-chess"></div>
+                        <div class="template-name">Chess</div>
+                    </div>
+                    <div class="template-item" data-template="jungle">
+                        <div class="template-preview template-jungle"></div>
+                        <div class="template-name">Jungle</div>
+                    </div>
+                    <div class="template-item" data-template="arabic">
+                        <div class="template-preview template-arabic"></div>
+                        <div class="template-name">Arabic</div>
+                    </div>
+                    <div class="template-item" data-template="tea">
+                        <div class="template-preview template-tea"></div>
+                        <div class="template-name">Tea</div>
+                    </div>
+                    <div class="template-item" data-template="grape">
+                        <div class="template-preview template-grape"></div>
+                        <div class="template-name">Grape</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Controls Container -->
+            <div class="qr-controls-container">
+                <!-- Main Settings -->
+                <div class="control-group">
+                    <h3>Main Settings</h3>
+                    <div class="form-group">
+                        <label for="qr-data">Data to Encode</label>
+                        <input type="text" id="qr-data" class="form-control" value="https://example.com" placeholder="Enter text or URL">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="qr-width">Width (px)</label>
+                            <input type="number" id="qr-width" class="form-control" value="300" min="100" max="1000">
+                        </div>
+                        <div class="form-group">
+                            <label for="qr-height">Height (px)</label>
+                            <input type="number" id="qr-height" class="form-control" value="300" min="100" max="1000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qr-template">Template</label>
+                        <select id="qr-template" class="form-control">
+                            <option value="">None</option>
+                            <option value="default">Default</option>
+                            <option value="ocean">Ocean</option>
+                            <option value="sunflower">Sunflower</option>
+                            <option value="luxury">Luxury</option>
+                            <option value="bitcoin">Bitcoin</option>
+                            <option value="starbucks">Starbucks</option>
+                            <option value="angular">Angular</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="beans">Beans</option>
+                            <option value="green">Green</option>
+                            <option value="sky">Sky</option>
+                            <option value="mosaic">Mosaic</option>
+                            <option value="coffee">Coffee</option>
+                            <option value="vintage">Vintage</option>
+                            <option value="stamp">Stamp</option>
+                            <option value="chess">Chess</option>
+                            <option value="jungle">Jungle</option>
+                            <option value="arabic">Arabic</option>
+                            <option value="tea">Tea</option>
+                            <option value="grape">Grape</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Dots Settings -->
+                <div class="control-group">
+                    <h3>Dots Style</h3>
+                    <div class="form-group">
+                        <label for="dots-type">Dot Type</label>
+                        <select id="dots-type" class="form-control">
+                            <option value="square">Square</option>
+                            <option value="dots">Dots</option>
+                            <option value="rounded">Rounded</option>
+                            <option value="classy">Classy</option>
+                            <option value="classy-rounded">Classy Rounded</option>
+                            <option value="extra-rounded">Extra Rounded</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dots-color">Dot Color</label>
+                        <input type="color" id="dots-color" class="form-control color-picker" value="#000000">
+                    </div>
+                </div>
+                
+                <!-- Corners Settings -->
+                <div class="control-group">
+                    <h3>Corners Style</h3>
+                    <div class="form-group">
+                        <label for="corners-square-type">Corner Square Type</label>
+                        <select id="corners-square-type" class="form-control">
+                            <option value="">None</option>
+                            <option value="square">Square</option>
+                            <option value="dot">Dot</option>
+                            <option value="extra-rounded">Extra Rounded</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="corners-dot-type">Corner Dot Type</label>
+                        <select id="corners-dot-type" class="form-control">
+                            <option value="">None</option>
+                            <option value="square">Square</option>
+                            <option value="dot">Dot</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="corners-color">Corner Color</label>
+                        <input type="color" id="corners-color" class="form-control color-picker" value="#000000">
+                    </div>
+                </div>
+                
+                <!-- Background Settings -->
+                <div class="control-group">
+                    <h3>Background</h3>
+                    <div class="form-group">
+                        <label for="background-color">Background Color</label>
+                        <input type="color" id="background-color" class="form-control color-picker" value="#ffffff">
+                    </div>
+                </div>
+                
+                <!-- Image/Logo Settings -->
+                <div class="control-group">
+                    <h3>Logo Settings</h3>
+                    <div class="form-group">
+                        <label for="logo-url">Logo URL</label>
+                        <input type="text" id="logo-url" class="form-control" placeholder="Enter logo image URL">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="logo-margin">Logo Margin</label>
+                        <input type="range" id="logo-margin" class="form-control" min="0" max="20" value="5">
+                        <span id="logo-margin-value">5</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="logo-size">Logo Size</label>
+                        <input type="range" id="logo-size" class="form-control" min="0" max="1" step="0.1" value="0.4">
+                        <span id="logo-size-value">0.4</span>
+                    </div>
+                </div>
+                
+                <!-- Frame Settings -->
+                <div class="control-group">
+                    <h3>Frame Settings</h3>
+                    <div class="form-group">
+                        <label for="frame-style">Frame Style</label>
+                        <select id="frame-style" class="form-control">
+                            <option value="">None</option>
+                            <option value="F_020">F_020</option>
+                            <option value="F_036">F_036</option>
+                            <option value="F_040">F_040</option>
+                            <option value="F_050">F_050</option>
+                            <option value="F_060">F_060</option>
+                            <option value="F_070">F_070</option>
+                            <option value="F_080">F_080</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frame-width">Frame Width</label>
+                            <input type="number" id="frame-width" class="form-control" value="300" min="100" max="1000">
+                        </div>
+                        <div class="form-group">
+                            <label for="frame-height">Frame Height</label>
+                            <input type="number" id="frame-height" class="form-control" value="300" min="100" max="1000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frame-x">Frame X Position</label>
+                            <input type="number" id="frame-x" class="form-control" value="50" min="0" max="500">
+                        </div>
+                        <div class="form-group">
+                            <label for="frame-y">Frame Y Position</label>
+                            <input type="number" id="frame-y" class="form-control" value="50" min="0" max="500">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error Correction -->
+                <div class="control-group">
+                    <h3>Error Correction</h3>
+                    <div class="form-group">
+                        <label for="error-correction">Level</label>
+                        <select id="error-correction" class="form-control">
+                            <option value="L">L - ~7%</option>
+                            <option value="M" selected>M - ~15%</option>
+                            <option value="Q">Q - ~25%</option>
+                            <option value="H">H - ~30%</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button id="generate-qr-btn" class="btn btn-primary">Generate QR Code</button>
+                    <button id="download-qr-btn" class="btn">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- QR Code Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize elements
+            const qrCodePreview = document.getElementById('qr-code-preview');
+            const generateBtn = document.getElementById('generate-qr-btn');
+            const downloadBtn = document.getElementById('download-qr-btn');
+            const templateItems = document.querySelectorAll('.template-item');
+            
+            // Form elements
+            const dataInput = document.getElementById('qr-data');
+            const widthInput = document.getElementById('qr-width');
+            const heightInput = document.getElementById('qr-height');
+            const templateSelect = document.getElementById('qr-template');
+            const dotsType = document.getElementById('dots-type');
+            const dotsColor = document.getElementById('dots-color');
+            const cornersSquareType = document.getElementById('corners-square-type');
+            const cornersDotType = document.getElementById('corners-dot-type');
+            const cornersColor = document.getElementById('corners-color');
+            const backgroundColor = document.getElementById('background-color');
+            const logoUrl = document.getElementById('logo-url');
+            const logoMargin = document.getElementById('logo-margin');
+            const logoMarginValue = document.getElementById('logo-margin-value');
+            const logoSize = document.getElementById('logo-size');
+            const logoSizeValue = document.getElementById('logo-size-value');
+            const frameStyle = document.getElementById('frame-style');
+            const frameWidth = document.getElementById('frame-width');
+            const frameHeight = document.getElementById('frame-height');
+            const frameX = document.getElementById('frame-x');
+            const frameY = document.getElementById('frame-y');
+            const errorCorrection = document.getElementById('error-correction');
+            
+            // Template definitions - predefined style combinations
+            const templates = {
+                '': {
+                    dotsOptions: { color: '#000000', type: 'square' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: {},
+                    cornersDotOptions: {}
+                },
+                'default': {
+                    dotsOptions: { color: '#000000', type: 'square' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#000000', type: 'square' },
+                    cornersDotOptions: { color: '#000000', type: 'square' }
+                },
+                'ocean': {
+                    dotsOptions: { color: '#0072ff', type: 'rounded' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#0072ff', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#00c6ff', type: 'dot' }
+                },
+                'sunflower': {
+                    dotsOptions: { color: '#FFD700', type: 'dots' },
+                    backgroundOptions: { color: '#FFA500' },
+                    cornersSquareOptions: { color: '#8B4513', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#5D4037', type: 'dot' }
+                },
+                'luxury': {
+                    dotsOptions: { color: '#a6c1ee', type: 'classy' },
+                    backgroundOptions: { color: '#fbc2eb' },
+                    cornersSquareOptions: { color: '#fbc2eb', type: 'square' },
+                    cornersDotOptions: { color: '#a6c1ee', type: 'square' }
+                },
+                'bitcoin': {
+                    dotsOptions: { color: '#f5f7fa', type: 'extra-rounded' },
+                    backgroundOptions: { color: '#c3cfe2' },
+                    cornersSquareOptions: { color: '#f5f7fa', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#c3cfe2', type: 'dot' }
+                },
+                'starbucks': {
+                    dotsOptions: { color: '#009688', type: 'rounded' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#009688', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#4db6ac', type: 'dot' }
+                },
+                'angular': {
+                    dotsOptions: { color: '#dd0031', type: 'classy' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#dd0031', type: 'square' },
+                    cornersDotOptions: { color: '#c3002f', type: 'square' }
+                },
+                'facebook': {
+                    dotsOptions: { color: '#3b5998', type: 'rounded' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#3b5998', type: 'square' },
+                    cornersDotOptions: { color: '#4a69a8', type: 'dot' }
+                },
+                'beans': {
+                    dotsOptions: { color: '#8b4513', type: 'dots' },
+                    backgroundOptions: { color: '#f5f5dc' },
+                    cornersSquareOptions: { color: '#8b4513', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#a0522d', type: 'dot' }
+                },
+                'green': {
+                    dotsOptions: { color: '#11998e', type: 'extra-rounded' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#11998e', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#38ef7d', type: 'dot' }
+                },
+                'sky': {
+                    dotsOptions: { color: '#667eea', type: 'rounded' },
+                    backgroundOptions: { color: '#764ba2' },
+                    cornersSquareOptions: { color: '#667eea', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#764ba2', type: 'dot' }
+                },
+                'mosaic': {
+                    dotsOptions: { color: '#ffecd2', type: 'classy-rounded' },
+                    backgroundOptions: { color: '#fcb69f' },
+                    cornersSquareOptions: { color: '#ffecd2', type: 'square' },
+                    cornersDotOptions: { color: '#fcb69f', type: 'square' }
+                },
+                'coffee': {
+                    dotsOptions: { color: '#6f4e37', type: 'dots' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#6f4e37', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#8b4513', type: 'dot' }
+                },
+                'vintage': {
+                    dotsOptions: { color: '#d3cce3', type: 'rounded' },
+                    backgroundOptions: { color: '#e9e4f0' },
+                    cornersSquareOptions: { color: '#d3cce3', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#e9e4f0', type: 'dot' }
+                },
+                'stamp': {
+                    dotsOptions: { color: '#ff6b6b', type: 'classy' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#ff6b6b', type: 'square' },
+                    cornersDotOptions: { color: '#ffa07a', type: 'square' }
+                },
+                'chess': {
+                    dotsOptions: { color: '#2c3e50', type: 'square' },
+                    backgroundOptions: { color: '#34495e' },
+                    cornersSquareOptions: { color: '#2c3e50', type: 'square' },
+                    cornersDotOptions: { color: '#34495e', type: 'square' }
+                },
+                'jungle': {
+                    dotsOptions: { color: '#1d976c', type: 'dots' },
+                    backgroundOptions: { color: '#93f9b9' },
+                    cornersSquareOptions: { color: '#1d976c', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#93f9b9', type: 'dot' }
+                },
+                'arabic': {
+                    dotsOptions: { color: '#ffd89b', type: 'classy-rounded' },
+                    backgroundOptions: { color: '#19547b' },
+                    cornersSquareOptions: { color: '#ffd89b', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#19547b', type: 'dot' }
+                },
+                'tea': {
+                    dotsOptions: { color: '#bdc3c7', type: 'rounded' },
+                    backgroundOptions: { color: '#ffffff' },
+                    cornersSquareOptions: { color: '#2c3e50', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#bdc3c7', type: 'dot' }
+                },
+                'grape': {
+                    dotsOptions: { color: '#fdbb2d', type: 'extra-rounded' },
+                    backgroundOptions: { color: '#22c1c3' },
+                    cornersSquareOptions: { color: '#fdbb2d', type: 'extra-rounded' },
+                    cornersDotOptions: { color: '#22c1c3', type: 'dot' }
+                }
+            };
+            
+            // Initialize QR Code Styling
+            let qrCode = new QRCodeStyling({
+                width: 300,
+                height: 300,
+                data: "https://example.com",
+                margin: 5,
+                qrOptions: {
+                    errorCorrectionLevel: "M"
+                },
+                dotsOptions: {
+                    color: "#000000",
+                    type: "square"
+                },
+                backgroundOptions: {
+                    color: "#ffffff",
+                }
+            });
+            
+            // Append to preview container
+            qrCode.append(qrCodePreview);
+            
+            // Update logo margin value display
+            logoMargin.addEventListener('input', function() {
+                logoMarginValue.textContent = this.value;
+                generateQRCode();
+            });
+            
+            // Update logo size value display
+            logoSize.addEventListener('input', function() {
+                logoSizeValue.textContent = this.value;
+                generateQRCode();
+            });
+            
+            // Template selection
+            templateItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    templateItems.forEach(i => i.classList.remove('active'));
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Get template value
+                    const template = this.getAttribute('data-template');
+                    
+                    // Update select dropdown
+                    templateSelect.value = template;
+                    
+                    // Apply template styles
+                    applyTemplate(template);
+                });
+            });
+            
+            // Apply template styles
+            function applyTemplate(templateName) {
+                const template = templates[templateName] || templates[''];
+                
+                // Update form elements to match template
+                if (template.dotsOptions) {
+                    dotsType.value = template.dotsOptions.type || 'square';
+                    dotsColor.value = template.dotsOptions.color || '#000000';
+                }
+                
+                if (template.backgroundOptions) {
+                    backgroundColor.value = template.backgroundOptions.color || '#ffffff';
+                }
+                
+                if (template.cornersSquareOptions && template.cornersSquareOptions.type) {
+                    cornersSquareType.value = template.cornersSquareOptions.type;
+                } else {
+                    cornersSquareType.value = '';
+                }
+                
+                if (template.cornersDotOptions && template.cornersDotOptions.type) {
+                    cornersDotType.value = template.cornersDotOptions.type;
+                } else {
+                    cornersDotType.value = '';
+                }
+                
+                if (template.cornersSquareOptions && template.cornersSquareOptions.color) {
+                    cornersColor.value = template.cornersSquareOptions.color;
+                } else if (template.cornersDotOptions && template.cornersDotOptions.color) {
+                    cornersColor.value = template.cornersDotOptions.color;
+                }
+                
+                // Generate QR code with template styles
+                generateQRCode();
+            }
+            
+            // Generate QR Code
+            function generateQRCode() {
+                const config = {
+                    width: parseInt(widthInput.value),
+                    height: parseInt(heightInput.value),
+                    data: dataInput.value,
+                    margin: 5,
+                    qrOptions: {
+                        errorCorrectionLevel: errorCorrection.value
+                    },
+                    dotsOptions: {
+                        color: dotsColor.value,
+                        type: dotsType.value
+                    },
+                    cornersSquareOptions: {
+                        color: cornersColor.value,
+                        type: cornersSquareType.value || undefined
+                    },
+                    cornersDotOptions: {
+                        color: cornersColor.value,
+                        type: cornersDotType.value || undefined
+                    },
+                    backgroundOptions: {
+                        color: backgroundColor.value
+                    },
+                    imageOptions: {
+                        margin: parseInt(logoMargin.value),
+                        imageSize: parseFloat(logoSize.value),
+                        hideBackgroundDots: true,
+                        crossOrigin: "anonymous"
+                    }
+                };
+                
+                // Add frame options if style is selected
+                if (frameStyle.value) {
+                    config.frameOptions = {
+                        style: frameStyle.value,
+                        width: parseInt(frameWidth.value),
+                        height: parseInt(frameHeight.value),
+                        x: parseInt(frameX.value),
+                        y: parseInt(frameY.value)
+                    };
+                } else {
+                    // If no frame style selected, make sure to remove frameOptions property
+                    delete config.frameOptions;
+                }
+                
+                // Add logo if URL is provided
+                if (logoUrl.value.trim() !== '') {
+                    config.image = logoUrl.value;
+                } else {
+                    // If no logo URL, make sure to remove image property
+                    delete config.image;
+                }
+                
+                // Update QR code
+                qrCode.update(config);
+            }
+            
+            // Download QR Code
+            function downloadQRCode() {
+                qrCode.download({
+                    name: "qr-code",
+                    extension: "png"
+                });
+            }
+            
+            // Event listeners for real-time updates
+            generateBtn.addEventListener('click', generateQRCode);
+            downloadBtn.addEventListener('click', downloadQRCode);
+            
+            // Real-time updates for all inputs
+            dataInput.addEventListener('input', generateQRCode);
+            widthInput.addEventListener('input', generateQRCode);
+            heightInput.addEventListener('input', generateQRCode);
+            templateSelect.addEventListener('change', function() {
+                // Find and activate the corresponding template item
+                templateItems.forEach(item => {
+                    if (item.getAttribute('data-template') === this.value) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                applyTemplate(this.value);
+            });
+            dotsType.addEventListener('change', generateQRCode);
+            dotsColor.addEventListener('input', generateQRCode);
+            cornersSquareType.addEventListener('change', generateQRCode);
+            cornersDotType.addEventListener('change', generateQRCode);
+            cornersColor.addEventListener('input', generateQRCode);
+            backgroundColor.addEventListener('input', generateQRCode);
+            logoUrl.addEventListener('input', generateQRCode);
+            frameStyle.addEventListener('change', generateQRCode);
+            frameWidth.addEventListener('input', generateQRCode);
+            frameHeight.addEventListener('input', generateQRCode);
+            frameX.addEventListener('input', generateQRCode);
+            frameY.addEventListener('input', generateQRCode);
+            errorCorrection.addEventListener('change', generateQRCode);
+            
+            // Initialize with default QR code
+            generateQRCode();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Calculator Styles */
+        .calculator-container {
+            width: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+        }
+
+        .calculator {
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            padding: 20px 15px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .calculator-brand {
+            color: white;
+            font-size: 24px;
+            margin: 10px 0 5px 5px;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .calculator-model {
+            color: #888;
+            font-size: 14px;
+            margin: 0 0 15px 5px;
+            font-family: 'Arial', sans-serif;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .calculator-display {
+            background: linear-gradient(145deg, #c8c8b5, #d0d0bd);
+            padding: 15px 10px;
+            margin: 15px 0;
+            border-radius: 5px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #aaa;
+        }
+
+        .mode-indicator {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            font-size: 10px;
+            color: #333;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        #display {
+            width: 100%;
+            padding: 5px;
+            margin: 2px 0;
+            text-align: right;
+            background: transparent;
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: normal;
+            color: #1a1a1a;
+            min-height: 30px;
+            outline: none;
+        }
+
+        /* Calculator buttons grid */
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 10px 5px;
+        }
+
+        /* Base button styles */
+        .calculator-buttons button {
+            padding: 8px 5px;
+            font-size: 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #2a2a2a;
+            color: white;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            min-height: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            user-select: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .calculator-buttons button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .calculator-buttons button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            filter: brightness(0.95);
+        }
+
+        /* Button types */
+        .shift-btn {
+            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
+            border: 1px solid #333;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .alpha-btn {
+            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
+            border: 1px solid #333;
+            color: #ff6b6b;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .function-btn {
+            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
+            color: #00ff00;
+            font-size: 11px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .number-btn {
+            background: linear-gradient(to bottom, #404040, #333);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .clear-btn {
+            background: linear-gradient(to bottom, #cc0000, #990000);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .clear-btn:hover {
+            background: linear-gradient(to bottom, #ff0000, #cc0000);
+        }
+
+        .operator {
+            background: linear-gradient(to bottom, #0066cc, #004499);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .equals-btn {
+            background: linear-gradient(to bottom, #009900, #007700);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+            grid-row: span 2;
+        }
+
+        .function-btn small {
+            font-size: 8px;
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator">
+            <div class="calculator-brand">CASIO</div>
+            <div class="calculator-model">fx-991EX</div>
+            
+            <div class="calculator-display">
+                <div class="mode-indicator">COMP</div>
+                <input type="text" id="display" readonly value="0">
+            </div>
+            
+            <div class="calculator-buttons">
+                <button class="function-btn shift-btn">SHIFT</button>
+                <button class="function-btn alpha-btn">ALPHA</button>
+                <button class="function-btn" onclick="clearDisplay()">C</button>
+                <button class="function-btn" onclick="deleteLast()">⌫</button>
+                <button class="function-btn" onclick="appendToDisplay('/')">÷</button>
+                
+                <button class="function-btn" onclick="memoryClear()"><small>MC</small>𝑥!</button>
+                <button class="function-btn" onclick="memoryRecall()"><small>MR</small>𝑥<sup>□</sup></button>
+                <button class="function-btn" onclick="memoryAdd()"><small>M+</small>𝑥<sup>3</sup></button>
+                <button class="function-btn" onclick="memorySubtract()"><small>M-</small>𝑥<sup>-1</sup></button>
+                <button class="function-btn" onclick="appendToDisplay('*')">×</button>
+                
+                <button class="function-btn" onclick="appendToDisplay('Math.sin(')"><small>SHIF</small>sin</button>
+                <button class="function-btn" onclick="appendToDisplay('Math.cos(')"><small>SHIF</small>cos</button>
+                <button class="function-btn" onclick="appendToDisplay('Math.tan(')"><small>SHIF</small>tan</button>
+                <button class="function-btn" onclick="appendToDisplay('Math.PI')">𝜋</button>
+                <button class="function-btn" onclick="appendToDisplay('-')">-</button>
+                
+                <button class="function-btn" onclick="appendToDisplay('Math.log(')"><small>SHIF</small>log</button>
+                <button class="function-btn" onclick="appendToDisplay('Math.LN10')"><small>SHIF</small>ln</button>
+                <button class="number-btn" onclick="appendToDisplay('7')">7</button>
+                <button class="number-btn" onclick="appendToDisplay('8')">8</button>
+                <button class="number-btn" onclick="appendToDisplay('9')">9</button>
+                
+                <button class="function-btn" onclick="appendToDisplay('(')">(</button>
+                <button class="function-btn" onclick="appendToDisplay(')')">)</button>
+                <button class="number-btn" onclick="appendToDisplay('4')">4</button>
+                <button class="number-btn" onclick="appendToDisplay('5')">5</button>
+                <button class="number-btn" onclick="appendToDisplay('6')">6</button>
+                
+                <button class="function-btn" onclick="appendToDisplay('Math.sqrt(')">√</button>
+                <button class="function-btn" onclick="appendToDisplay('Math.pow(')">𝑥<sup>□</sup></button>
+                <button class="number-btn" onclick="appendToDisplay('1')">1</button>
+                <button class="number-btn" onclick="appendToDisplay('2')">2</button>
+                <button class="number-btn" onclick="appendToDisplay('3')">3</button>
+                
+                <button class="function-btn" onclick="appendToDisplay('Math.E')">𝑒</button>
+                <button class="function-btn" onclick="appendToDisplay('10**')">10<sup>□</sup></button>
+                <button class="number-btn" onclick="appendToDisplay('0')">0</button>
+                <button class="number-btn" onclick="appendToDisplay('.')">.</button>
+                <button class="equals-btn operator" onclick="calculate()">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calculator functions
+        let currentValue = '';
+        let previousValue = '';
+        let operation = null;
+        let memoryValue = 0;
+
+        function appendToDisplay(value) {
+            if (currentValue === '0' && value !== '.') {
+                currentValue = '';
+            }
+            currentValue += value;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('display').value = currentValue || '0';
+        }
+
+        function clearDisplay() {
+            currentValue = '';
+            previousValue = '';
+            operation = null;
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            currentValue = currentValue.slice(0, -1);
+            updateDisplay();
+        }
+
+        function calculate() {
+            try {
+                // Replace × with * and ÷ with / for evaluation
+                let expression = currentValue.replace(/×/g, '*').replace(/÷/g, '/');
+                // Evaluate the expression
+                const result = eval(expression);
+                currentValue = result.toString();
+                updateDisplay();
+            } catch (error) {
+                currentValue = 'Error';
+                updateDisplay();
+                setTimeout(clearDisplay, 1000);
+            }
+        }
+
+        // Memory functions
+        function memoryAdd() {
+            memoryValue += parseFloat(currentValue || '0');
+        }
+
+        function memorySubtract() {
+            memoryValue -= parseFloat(currentValue || '0');
+        }
+
+        function memoryRecall() {
+            currentValue = memoryValue.toString();
+            updateDisplay();
+        }
+
+        function memoryClear() {
+            memoryValue = 0;
+        }
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
