@@ -8,16 +8,14 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
+    <a href="index.html" class="page-title">My Online Tools</a>
     <nav class="top-nav">
-        <div class="nav-brand">
-            <a href="index.html">My Online Tools</a>
-        </div>
         <ul class="nav-menu">
             <li class="nav-item">
                 <a href="calculator.html" class="nav-link" id="calculator-link">Scientific Calculator</a>
             </li>
             <li class="nav-item">
-                <a href="index.html" class="nav-link active" id="barcode-link">Barcode & QR Code</a>
+                <a href="barcode.html" class="nav-link active" id="barcode-link">Barcode & QR Code</a>
             </li>
             <li class="nav-item">
                 <a href="pdf.html" class="nav-link" id="pdf-link">PDF Tools</a>
@@ -42,9 +40,48 @@
                 <span id="invalid" style="display: none;">Not valid data for this barcode type!</span>
             </div>
             
+            <!-- Bulk Generation Container -->
+            <div id="bulk-barcode-container" style="display: none; margin-top: 20px;">
+                <div id="bulk-barcode-grid" class="bulk-barcode-grid"></div>
+                <!-- Download PDF Button for Bulk Barcodes -->
+                <div id="bulk-download-section" style="margin-top: 20px; text-align: center; display: none;">
+                    <button id="download-bulk-pdf" class="btn btn-primary" style="padding: 10px 20px;">
+                        <i class="fa fa-download"></i> Download All Barcodes as PDF
+                    </button>
+                    <!-- PDF Customization Dropdown -->
+                    <div class="pdf-customization" style="display: inline-block; position: relative; margin-left: 10px;">
+                        <button id="pdf-settings-btn" class="btn" style="padding: 10px 15px;">
+                            <i class="fa fa-cog"></i> Settings
+                        </button>
+                        <div id="pdf-settings-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 15px; min-width: 250px; z-index: 1000; text-align: left;">
+                            <h4 style="margin-top: 0; margin-bottom: 15px; color: #333;">PDF Settings</h4>
+                            <div class="setting-row" style="margin-bottom: 12px;">
+                                <label for="barcodes-per-page" style="display: block; margin-bottom: 5px; font-weight: 500;">Barcodes per page:</label>
+                                <select id="barcodes-per-page" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                                    <option value="4">4 barcodes (2x2 grid)</option>
+                                    <option value="6">6 barcodes (2x3 grid)</option>
+                                    <option value="8" selected>8 barcodes (2x4 grid)</option>
+                                    <option value="9">9 barcodes (3x3 grid)</option>
+                                    <option value="12">12 barcodes (3x4 grid)</option>
+                                    <option value="16">16 barcodes (4x4 grid)</option>
+                                </select>
+                            </div>
+                            <div class="setting-row" style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">
+                                    <input type="checkbox" id="include-values" checked style="margin-right: 5px;"> 
+                                    Include barcode values
+                                </label>
+                            </div>
+                            <button id="apply-settings" class="btn btn-primary" style="width: 100%;">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Input and Main Controls -->
             <div class="barcode-input-container">
                 <input type="text" id="userInput" class="barcode-text-input" value="Example 1234" placeholder="Enter text to encode">
+                <textarea id="bulkUserInput" class="barcode-text-input" style="display: none; height: 150px; resize: vertical;" placeholder="Enter one barcode value per line&#10;Example 1234&#10;Example 5678&#10;Example 9012"></textarea>
                 <button id="generate-button" class="generate-btn">Generate</button>
                 <select id="barcodeType" class="barcode-type-select">
                     <option value="CODE128">CODE128</option>
@@ -68,8 +105,14 @@
                     <option value="pharmacode">Pharmacode</option>
                     <option value="codabar">Codabar</option>
                     <option value="code93">CODE93</option>
-                    <option value="QR">QR Code</option>
+                    <option value="QR" selected>QR Code</option>
                 </select>
+            </div>
+            
+            <!-- Mode Toggle Buttons -->
+            <div class="mode-toggle-container" style="display: flex; gap: 10px; margin: 10px 0;">
+                <button id="single-mode-btn" class="btn btn-primary">Single Barcode</button>
+                <button id="bulk-mode-btn" class="btn">Bulk Generation</button>
             </div>
             
             <!-- Advanced Options Toggle -->
@@ -198,17 +241,28 @@
     
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.12.1/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // Barcode generation functionality
         document.addEventListener('DOMContentLoaded', function() {
             const barcodeElement = document.getElementById('barcode');
             const qrcodeElement = document.getElementById('qrcode');
             const userInput = document.getElementById('userInput');
+            const bulkUserInput = document.getElementById('bulkUserInput');
             const barcodeType = document.getElementById('barcodeType');
             const invalidMessage = document.getElementById('invalid');
             const generateButton = document.getElementById('generate-button');
             const toggleAdvanced = document.getElementById('toggle-advanced');
             const advancedOptions = document.getElementById('advanced-options');
+            const bulkBarcodeContainer = document.getElementById('bulk-barcode-container');
+            const bulkBarcodeGrid = document.getElementById('bulk-barcode-grid');
+            const singleModeBtn = document.getElementById('single-mode-btn');
+            const bulkModeBtn = document.getElementById('bulk-mode-btn');
+            
+            // PDF download button
+            const downloadBulkPdfBtn = document.getElementById('download-bulk-pdf');
+            const bulkDownloadSection = document.getElementById('bulk-download-section');
             
             // Control elements
             const barWidth = document.getElementById('bar-width');
@@ -233,6 +287,9 @@
             // QR Code instance
             let qrCodeInstance = null;
             
+            // Mode state
+            let isBulkMode = false;
+            
             // Toggle advanced options
             toggleAdvanced.addEventListener('click', function() {
                 const isExpanded = advancedOptions.style.display === 'block';
@@ -241,8 +298,39 @@
                 arrow.textContent = isExpanded ? '▼' : '▲';
             });
             
+            // Toggle between single and bulk mode
+            singleModeBtn.addEventListener('click', function() {
+                isBulkMode = false;
+                singleModeBtn.classList.add('btn-primary');
+                bulkModeBtn.classList.remove('btn-primary');
+                userInput.style.display = 'block';
+                bulkUserInput.style.display = 'none';
+                barcodeElement.parentElement.style.display = 'flex';
+                bulkBarcodeContainer.style.display = 'none';
+                bulkDownloadSection.style.display = 'none';
+            });
+            
+            bulkModeBtn.addEventListener('click', function() {
+                isBulkMode = true;
+                bulkModeBtn.classList.add('btn-primary');
+                singleModeBtn.classList.remove('btn-primary');
+                userInput.style.display = 'none';
+                bulkUserInput.style.display = 'block';
+                barcodeElement.parentElement.style.display = 'none';
+                bulkBarcodeContainer.style.display = 'block';
+            });
+            
             // Generate barcode function
             function generateBarcode() {
+                if (isBulkMode) {
+                    generateBulkBarcodes();
+                } else {
+                    generateSingleBarcode();
+                }
+            }
+            
+            // Generate single barcode (original functionality)
+            function generateSingleBarcode() {
                 const text = userInput.value || 'Example 1234';
                 const type = barcodeType.value;
                 
@@ -325,6 +413,330 @@
                 }
             }
             
+            // Generate bulk barcodes
+            function generateBulkBarcodes() {
+                const bulkText = bulkUserInput.value;
+                if (!bulkText.trim()) {
+                    bulkBarcodeGrid.innerHTML = '<p>Please enter at least one barcode value.</p>';
+                    bulkDownloadSection.style.display = 'none';
+                    return;
+                }
+                
+                // Split text by new lines and filter out empty lines
+                const barcodeValues = bulkText.split('\n').filter(line => line.trim() !== '');
+                
+                // Clear previous bulk barcodes
+                bulkBarcodeGrid.innerHTML = '';
+                
+                // Show download section if we have barcodes
+                bulkDownloadSection.style.display = barcodeValues.length > 0 ? 'block' : 'none';
+                
+                // Generate a barcode for each value
+                barcodeValues.forEach((value, index) => {
+                    const barcodeItem = document.createElement('div');
+                    barcodeItem.className = 'bulk-barcode-item';
+                    barcodeItem.innerHTML = `
+                        <div class="barcode-value" title="${value}">${value.length > 30 ? value.substring(0, 30) + '...' : value}</div>
+                        <div class="barcode-container">
+                            <svg class="bulk-barcode-svg"></svg>
+                            <div class="qrcode-container" style="display: none;"></div>
+                            <div class="invalid-message" style="display: none;">Not valid data for this barcode type!</div>
+                        </div>
+                    `;
+                    
+                    bulkBarcodeGrid.appendChild(barcodeItem);
+                    
+                    const barcodeSvg = barcodeItem.querySelector('.bulk-barcode-svg');
+                    const qrcodeContainer = barcodeItem.querySelector('.qrcode-container');
+                    const invalidMsg = barcodeItem.querySelector('.invalid-message');
+                    const type = barcodeType.value;
+                    
+                    // Handle QR code separately
+                    if (type === 'QR') {
+                        try {
+                            barcodeSvg.style.display = 'none';
+                            qrcodeContainer.style.display = 'block';
+                            
+                            // Create new QR code
+                            new QRCode(qrcodeContainer, {
+                                text: value,
+                                width: 150,
+                                height: 150,
+                                colorDark: lineColor.value,
+                                colorLight: backgroundColor.value,
+                                correctLevel: QRCode.CorrectLevel.H
+                            });
+                            
+                            console.log('Bulk QR code generated successfully for:', value);
+                        } catch (e) {
+                            console.error('Bulk QR Code generation error:', e);
+                            invalidMsg.style.display = 'block';
+                            qrcodeContainer.style.display = 'none';
+                        }
+                        return;
+                    }
+                    
+                    // Handle regular barcodes
+                    qrcodeContainer.style.display = 'none';
+                    barcodeSvg.style.display = 'block';
+                    
+                    const settings = {
+                        format: type,
+                        width: parseInt(barWidth.value),
+                        height: parseInt(barHeight.value),
+                        margin: parseInt(barMargin.value),
+                        background: backgroundColor.value,
+                        lineColor: lineColor.value,
+                        displayValue: document.querySelector('.display-text.btn-primary').value === 'true',
+                        textAlign: document.querySelector('.text-align.btn-primary').value,
+                        font: fontSelect.value,
+                        fontSize: parseInt(barFontSize.value),
+                        textMargin: parseInt(barTextMargin.value)
+                    };
+                    
+                    // Handle font options
+                    const fontOptions = [];
+                    fontOptionButtons.forEach(button => {
+                        if (button.classList.contains('btn-primary')) {
+                            fontOptions.push(button.value);
+                        }
+                    });
+                    
+                    if (fontOptions.includes('bold')) settings.fontOptions = settings.fontOptions ? settings.fontOptions + ' bold' : 'bold';
+                    if (fontOptions.includes('italic')) settings.fontOptions = settings.fontOptions ? settings.fontOptions + ' italic' : 'italic';
+                    
+                    try {
+                        console.log('Generating bulk barcode with settings:', settings);
+                        JsBarcode(barcodeSvg, value, settings);
+                        invalidMsg.style.display = 'none';
+                        console.log('Bulk barcode generated successfully for:', value);
+                    } catch (e) {
+                        console.error('Bulk barcode generation error:', e);
+                        invalidMsg.style.display = 'block';
+                        barcodeSvg.style.display = 'none';
+                    }
+                });
+            }
+            
+            // PDF customization elements
+            const pdfSettingsBtn = document.getElementById('pdf-settings-btn');
+            const pdfSettingsDropdown = document.getElementById('pdf-settings-dropdown');
+            const barcodesPerPageSelect = document.getElementById('barcodes-per-page');
+            const includeValuesCheckbox = document.getElementById('include-values');
+            const applySettingsBtn = document.getElementById('apply-settings');
+            
+            // PDF settings
+            let pdfSettings = {
+                barcodesPerPage: 8,
+                includeValues: true
+            };
+            
+            // Toggle PDF settings dropdown
+            if (pdfSettingsBtn) {
+                pdfSettingsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isExpanded = pdfSettingsDropdown.style.display === 'block';
+                    pdfSettingsDropdown.style.display = isExpanded ? 'none' : 'block';
+                });
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (pdfSettingsDropdown && !pdfSettingsDropdown.contains(e.target) && 
+                    pdfSettingsBtn && !pdfSettingsBtn.contains(e.target)) {
+                    pdfSettingsDropdown.style.display = 'none';
+                }
+            });
+            
+            // Apply PDF settings
+            if (applySettingsBtn) {
+                applySettingsBtn.addEventListener('click', function() {
+                    pdfSettings.barcodesPerPage = parseInt(barcodesPerPageSelect.value);
+                    pdfSettings.includeValues = includeValuesCheckbox.checked;
+                    pdfSettingsDropdown.style.display = 'none';
+                });
+            }
+            
+            // Download bulk barcodes as PDF
+            if (downloadBulkPdfBtn) {
+                downloadBulkPdfBtn.addEventListener('click', function() {
+                    downloadBulkBarcodesAsPDF();
+                });
+            }
+            
+            // Function to download all bulk barcodes as PDF
+            function downloadBulkBarcodesAsPDF() {
+                const { jsPDF } = window.jspdf;
+                const bulkItems = document.querySelectorAll('.bulk-barcode-item');
+                
+                if (bulkItems.length === 0) {
+                    alert('No barcodes to download.');
+                    return;
+                }
+                
+                // Show loading message
+                const originalText = downloadBulkPdfBtn.innerHTML;
+                downloadBulkPdfBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generating PDF...';
+                downloadBulkPdfBtn.disabled = true;
+                
+                // Add a small delay to ensure all barcodes are fully rendered
+                setTimeout(() => {
+                    try {
+                        // Create a new PDF
+                        const doc = new jsPDF('p', 'mm', 'a4');
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        const pageHeight = doc.internal.pageSize.getHeight();
+                        const margin = 10;
+                        const contentWidth = pageWidth - 2 * margin;
+                        const contentHeight = pageHeight - 2 * margin;
+                        
+                        // Calculate grid layout based on barcodes per page setting
+                        let cols, rows;
+                        switch(pdfSettings.barcodesPerPage) {
+                            case 4: 
+                                cols = 2; 
+                                rows = 2; 
+                                break;
+                            case 6: 
+                                cols = 2; 
+                                rows = 3; 
+                                break;
+                            case 8: 
+                                cols = 2; 
+                                rows = 4; 
+                                break;
+                            case 9: 
+                                cols = 3; 
+                                rows = 3; 
+                                break;
+                            case 12: 
+                                cols = 3; 
+                                rows = 4; 
+                                break;
+                            case 16: 
+                                cols = 4; 
+                                rows = 4; 
+                                break;
+                            default: 
+                                cols = 2; 
+                                rows = 4;
+                        }
+                        
+                        const cellWidth = (contentWidth - (cols - 1) * 5) / cols;
+                        const cellHeight = (contentHeight - (rows - 1) * 5) / rows;
+                        
+                        // Use html2canvas to capture each barcode item and add to PDF
+                        const promises = [];
+                        bulkItems.forEach((item, index) => {
+                            promises.push(
+                                html2canvas(item, {
+                                    scale: 2, // Higher quality for better scanning
+                                    useCORS: true,
+                                    allowTaint: true,
+                                    logging: false,
+                                    backgroundColor: null
+                                }).then(canvas => {
+                                    return { index, canvas, value: item.querySelector('.barcode-value').textContent };
+                                })
+                            );
+                        });
+                        
+                        // Process all barcodes when captured
+                        Promise.all(promises).then(results => {
+                            // Sort by index to maintain order
+                            results.sort((a, b) => a.index - b.index);
+                            
+                            let currentX = margin;
+                            let currentY = margin;
+                            let colIndex = 0;
+                            let rowIndex = 0;
+                            let itemsOnPage = 0;
+                            
+                            // Add title on first page
+                            doc.setFontSize(18);
+                            doc.setTextColor(0, 0, 0);
+                            doc.text('Bulk Barcodes Report', pageWidth / 2, currentY + 10, null, null, 'center');
+                            currentY += 20;
+                            
+                            results.forEach((result, idx) => {
+                                const imgData = result.canvas.toDataURL('image/png');
+                                
+                                // Position for current barcode
+                                currentX = margin + (colIndex * (cellWidth + 5));
+                                
+                                // Add barcode value if enabled
+                                let valueHeight = 0;
+                                if (pdfSettings.includeValues) {
+                                    valueHeight = 7;
+                                    doc.setFontSize(8);
+                                    doc.setTextColor(0, 0, 0);
+                                    // Truncate value if too long
+                                    const displayValue = result.value.length > 30 ? result.value.substring(0, 30) + '...' : result.value;
+                                    doc.text(displayValue, currentX + cellWidth/2, currentY + valueHeight, null, null, 'center');
+                                }
+                                
+                                // Calculate image dimensions to fit in cell
+                                const imgWidth = cellWidth - 10;
+                                const imgHeight = (result.canvas.height * imgWidth) / result.canvas.width;
+                                const imgY = currentY + valueHeight + 2;
+                                
+                                // Add image to PDF
+                                doc.addImage(imgData, 'PNG', currentX + 5, imgY, imgWidth, imgHeight);
+                                
+                                // Move to next position
+                                colIndex++;
+                                itemsOnPage++;
+                                
+                                if (colIndex >= cols) {
+                                    colIndex = 0;
+                                    rowIndex++;
+                                }
+                                
+                                // Check if we need a new page
+                                if (itemsOnPage >= pdfSettings.barcodesPerPage || 
+                                    (rowIndex >= rows && colIndex === 0)) {
+                                    // Add new page if there are more barcodes
+                                    if (idx < results.length - 1) {
+                                        doc.addPage();
+                                        rowIndex = 0;
+                                        colIndex = 0;
+                                        itemsOnPage = 0;
+                                        currentY = margin;
+                                        
+                                        // Add title on new page
+                                        doc.setFontSize(18);
+                                        doc.text('Bulk Barcodes Report (continued)', pageWidth / 2, currentY + 10, null, null, 'center');
+                                        currentY += 20;
+                                    }
+                                } else {
+                                    // Move Y position for next row
+                                    if (colIndex === 0) {
+                                        currentY += cellHeight + 5;
+                                    }
+                                }
+                            });
+                            
+                            // Save the PDF
+                            doc.save('bulk-barcodes.pdf');
+                            
+                            // Restore button
+                            downloadBulkPdfBtn.innerHTML = originalText;
+                            downloadBulkPdfBtn.disabled = false;
+                        }).catch(error => {
+                            console.error('Error generating PDF:', error);
+                            alert('Error generating PDF. Please try again.');
+                            downloadBulkPdfBtn.innerHTML = originalText;
+                            downloadBulkPdfBtn.disabled = false;
+                        });
+                    } catch (error) {
+                        console.error('Error generating PDF:', error);
+                        alert('Error generating PDF. Please try again.');
+                        downloadBulkPdfBtn.innerHTML = originalText;
+                        downloadBulkPdfBtn.disabled = false;
+                    }
+                }, 100); // Small delay to ensure rendering
+            }
+            
             // Initialize display values
             barWidthDisplay.textContent = barWidth.value;
             barHeightDisplay.textContent = barHeight.value;
@@ -343,6 +755,10 @@
             // Also generate on input change and type change for better UX
             if (userInput) {
                 userInput.addEventListener('input', generateBarcode);
+            }
+            
+            if (bulkUserInput) {
+                bulkUserInput.addEventListener('input', generateBarcode);
             }
             
             if (barcodeType) {

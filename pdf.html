@@ -8,10 +8,8 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
+    <a href="index.html" class="page-title">My Online Tools</a>
     <nav class="top-nav">
-        <div class="nav-brand">
-            <h2>My Online Tools</h2>
-        </div>
         <ul class="nav-menu">
             <li class="nav-item">
                 <a href="calculator.html" class="nav-link" id="calculator-link">Scientific Calculator</a>
@@ -20,7 +18,7 @@
                 <a href="barcode.html" class="nav-link" id="barcode-link">Barcode & QR Code</a>
             </li>
             <li class="nav-item">
-                <a href="index.html" class="nav-link active" id="pdf-link">PDF Tools</a>
+                <a href="pdf.html" class="nav-link active" id="pdf-link">PDF Tools</a>
             </li>
             <li class="nav-item">
                 <a href="design-qr.html" class="nav-link" id="design-qr-link">Design QR Code</a>
@@ -514,162 +512,6 @@
     </script>
     
     <style>
-        .pdf-tools-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .tool-selector {
-            margin-bottom: 20px;
-        }
-        
-        .tool-selector label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        .tool-description {
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #e9f7fe;
-            border-left: 4px solid #007acc;
-            border-radius: 4px;
-        }
-        
-        .file-drop-area {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-        
-        .file-drop-area:hover, .file-drop-area.drag-over {
-            border-color: #007acc;
-            background-color: #f0f8ff;
-        }
-        
-        .file-drop-area p {
-            margin-bottom: 20px;
-        }
-        
-        #file-input {
-            display: none;
-        }
-        
-        .file-list {
-            margin-bottom: 20px;
-        }
-        
-        .file-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        
-        .btn-primary {
-            background-color: #007acc;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #005a9e;
-        }
-        
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-        
-        .processing-indicator {
-            margin-top: 20px;
-            padding: 20px;
-            text-align: center;
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 4px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #e9ecef;
-            border-radius: 10px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background-color: #007acc;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        
-        .result-area {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 4px;
-            text-align: center;
-        }
-        
-        .error-message {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 4px;
-            color: #721c24;
-        }
-        
-        #opacity-value, #size-value {
-            display: inline-block;
-            margin-left: 10px;
-            font-weight: bold;
-        }
     </style>
 </body>
 </html>
