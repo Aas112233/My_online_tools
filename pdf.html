@@ -221,12 +221,199 @@
                 return;
             }
             
-            // In a real implementation, this would process the PDF
-            // For now, we'll just simulate the process
-            alert('In a full implementation, this would process your PDF files.\\n\\nNote: A complete PDF processing solution would require significant additional code that works with PDF.js and other libraries to perform operations like merging, splitting, compressing, etc.\\n\\nThis demo shows the user interface that would be used for such functionality.');
+            const selectedTool = toolSelect.value;
+            const file = fileInput.files[0];
             
-            // Show result area
+            // Show processing message
+            resultArea.innerHTML = '<p>Processing your PDF... Please wait.</p>';
             resultArea.style.display = 'block';
+            
+            // Read the PDF file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const typedarray = new Uint8Array(e.target.result);
+                
+                switch(selectedTool) {
+                    case 'merge':
+                        // For merge, we would need multiple files
+                        // This is a simplified version that just processes the first file
+                        processMergePDF(typedarray);
+                        break;
+                    case 'split':
+                        processSplitPDF(typedarray);
+                        break;
+                    case 'compress':
+                        processCompressPDF(typedarray);
+                        break;
+                    case 'remove-pages':
+                        processRemovePagesPDF(typedarray);
+                        break;
+                    case 'rotate':
+                        processRotatePDF(typedarray);
+                        break;
+                    case 'add-watermark':
+                        processWatermarkPDF(typedarray);
+                        break;
+                    default:
+                        alert('Selected tool not implemented yet.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        // Merge PDFs function (simplified)
+        function processMergePDF(typedarray) {
+            // In a full implementation, this would merge multiple PDFs
+            // For now, we'll just show a message
+            resultArea.innerHTML = `
+                <h3>Merge PDF</h3>
+                <p>In a complete implementation, this would merge multiple PDF files into one document.</p>
+                <p><strong>Note:</strong> Actual PDF merging requires combining multiple PDF documents, 
+                which would need additional implementation using PDF.js or a similar library.</p>
+                <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
+            `;
+        }
+        
+        // Split PDF function
+        function processSplitPDF(typedarray) {
+            // Load the PDF document
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                const splitPage = document.getElementById('split-page') ? 
+                    parseInt(document.getElementById('split-page').value) : 1;
+                
+                resultArea.innerHTML = `
+                    <h3>Split PDF</h3>
+                    <p>Your PDF has ${pdf.numPages} pages.</p>
+                    <p>In a complete implementation, this would split your PDF into two documents:</p>
+                    <ol>
+                        <li>Pages 1 to ${Math.min(splitPage, pdf.numPages)}</li>
+                        <li>Pages ${splitPage + 1} to ${pdf.numPages}</li>
+                    </ol>
+                    <p><strong>Note:</strong> Actual PDF splitting requires creating new PDF documents 
+                    with selected pages, which would need additional implementation using PDF.js.</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
+                `;
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                resultArea.innerHTML = `
+                    <h3>Error</h3>
+                    <p>There was an error processing your PDF: ${error.message}</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
+                `;
+            });
+        }
+        
+        // Compress PDF function
+        function processCompressPDF(typedarray) {
+            // Load the PDF document
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                resultArea.innerHTML = `
+                    <h3>Compress PDF</h3>
+                    <p>Your PDF has ${pdf.numPages} pages.</p>
+                    <p>In a complete implementation, this would compress your PDF by:</p>
+                    <ul>
+                        <li>Optimizing images</li>
+                        <li>Removing unnecessary objects</li>
+                        <li>Compressing streams</li>
+                        <li>Downsampling images</li>
+                    </ul>
+                    <p><strong>Note:</strong> Actual PDF compression requires reprocessing the PDF content 
+                    and applying compression algorithms, which would need additional implementation.</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
+                `;
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                resultArea.innerHTML = `
+                    <h3>Error</h3>
+                    <p>There was an error processing your PDF: ${error.message}</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
+                `;
+            });
+        }
+        
+        // Remove pages function
+        function processRemovePagesPDF(typedarray) {
+            // Load the PDF document
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                const pagesToRemove = document.getElementById('pages-to-remove') ? 
+                    document.getElementById('pages-to-remove').value : '';
+                
+                resultArea.innerHTML = `
+                    <h3>Remove Pages</h3>
+                    <p>Your PDF has ${pdf.numPages} pages.</p>
+                    <p>Pages to remove: ${pagesToRemove || 'None specified'}</p>
+                    <p>In a complete implementation, this would create a new PDF without the specified pages.</p>
+                    <p><strong>Note:</strong> Actual page removal requires creating a new PDF document 
+                    with only the desired pages, which would need additional implementation using PDF.js.</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
+                `;
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                resultArea.innerHTML = `
+                    <h3>Error</h3>
+                    <p>There was an error processing your PDF: ${error.message}</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
+                `;
+            });
+        }
+        
+        // Rotate pages function
+        function processRotatePDF(typedarray) {
+            // Load the PDF document
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                const rotateDegrees = document.getElementById('rotate-degrees') ? 
+                    document.getElementById('rotate-degrees').value : '90';
+                const rotatePages = document.getElementById('rotate-pages') ? 
+                    document.getElementById('rotate-pages').value : 'All pages';
+                
+                resultArea.innerHTML = `
+                    <h3>Rotate Pages</h3>
+                    <p>Your PDF has ${pdf.numPages} pages.</p>
+                    <p>Rotation: ${rotateDegrees}°</p>
+                    <p>Pages to rotate: ${rotatePages}</p>
+                    <p>In a complete implementation, this would rotate the specified pages by the selected angle.</p>
+                    <p><strong>Note:</strong> Actual page rotation requires modifying the page rotation 
+                    properties in the PDF, which would need additional implementation using PDF.js.</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
+                `;
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                resultArea.innerHTML = `
+                    <h3>Error</h3>
+                    <p>There was an error processing your PDF: ${error.message}</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
+                `;
+            });
+        }
+        
+        // Add watermark function
+        function processWatermarkPDF(typedarray) {
+            // Load the PDF document
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                const watermarkText = document.getElementById('watermark-text') ? 
+                    document.getElementById('watermark-text').value : 'WATERMARK';
+                const watermarkOpacity = document.getElementById('watermark-opacity') ? 
+                    document.getElementById('watermark-opacity').value : '0.5';
+                
+                resultArea.innerHTML = `
+                    <h3>Add Watermark</h3>
+                    <p>Your PDF has ${pdf.numPages} pages.</p>
+                    <p>Watermark text: ${watermarkText}</p>
+                    <p>Opacity: ${watermarkOpacity}</p>
+                    <p>In a complete implementation, this would add the specified watermark text 
+                    to each page of your PDF with the selected opacity.</p>
+                    <p><strong>Note:</strong> Adding watermarks requires modifying each page's content 
+                    stream to include the watermark text, which would need additional implementation.</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Process Another PDF</button>
+                `;
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                resultArea.innerHTML = `
+                    <h3>Error</h3>
+                    <p>There was an error processing your PDF: ${error.message}</p>
+                    <button class="btn btn-primary" onclick="resetTool()">Try Again</button>
+                `;
+            });
         }
     </script>
     
